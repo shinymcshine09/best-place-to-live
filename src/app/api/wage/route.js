@@ -1,0 +1,235 @@
+import { NextResponse } from 'next/server';
+
+export async function GET(req) {
+    const { searchParams } = new URL(req.url);
+    const minWage = parseFloat(searchParams.get('q0')) || 0; // Convert to number
+    const countryQuery = searchParams.get('country');
+
+    const gdpPerCapita2025 = [
+        { country: "Albania", gdpPerCapita: 10386.312 },
+        { country: "Algeria", gdpPerCapita: 5592.852 },
+        { country: "Andorra", gdpPerCapita: 45994.879 },
+        { country: "Angola", gdpPerCapita: 2990.597 },
+        { country: "Antigua and Barbuda", gdpPerCapita: 23215.537 },
+        { country: "Argentina", gdpPerCapita: 12053.982 },
+        { country: "Armenia", gdpPerCapita: 8964.961 },
+        { country: "Aruba", gdpPerCapita: 41492.606 },
+        { country: "Australia", gdpPerCapita: 67978.737 },
+        { country: "Austria", gdpPerCapita: 61079.62 },
+        { country: "Azerbaijan", gdpPerCapita: 7428.084 },
+        { country: "Bahamas, The", gdpPerCapita: 37180.045 },
+        { country: "Bahrain", gdpPerCapita: 29886.074 },
+        { country: "Bangladesh", gdpPerCapita: 2773.499 },
+        { country: "Barbados", gdpPerCapita: 26227.919 },
+        { country: "Belarus", gdpPerCapita: 8459.916 },
+        { country: "Belgium", gdpPerCapita: 58248.287 },
+        { country: "Belize", gdpPerCapita: 8354.51 },
+        { country: "Benin", gdpPerCapita: 1586.803 },
+        { country: "Bhutan", gdpPerCapita: 4495.129 },
+        { country: "Bolivia", gdpPerCapita: 4120.634 },
+        { country: "Bosnia and Herzegovina", gdpPerCapita: 8668.364 },
+        { country: "Botswana", gdpPerCapita: 8002.978 },
+        { country: "Brazil", gdpPerCapita: 10815.506 },
+        { country: "Brunei Darussalam", gdpPerCapita: 37023.382 },
+        { country: "Bulgaria", gdpPerCapita: 18455.625 },
+        { country: "Burkina Faso", gdpPerCapita: 952.484 },
+        { country: "Burundi", gdpPerCapita: 156.497 },
+        { country: "Cabo Verde", gdpPerCapita: 5711.537 },
+        { country: "Cambodia", gdpPerCapita: 2948.029 },
+        { country: "Cameroon", gdpPerCapita: 1922.852 },
+        { country: "Canada", gdpPerCapita: 55889.665 },
+        { country: "Central African Republic", gdpPerCapita: 548.832 },
+        { country: "Chad", gdpPerCapita: 1036.155 },
+        { country: "Chile", gdpPerCapita: 17926.521 },
+        { country: "China, People's Republic of", gdpPerCapita: 13873.312 },
+        { country: "Colombia", gdpPerCapita: 7895.434 },
+        { country: "Comoros", gdpPerCapita: 1687.17 },
+        { country: "Congo, Dem. Rep. of the", gdpPerCapita: 743.648 },
+        { country: "Congo, Republic of", gdpPerCapita: 2454.478 },
+        { country: "Costa Rica", gdpPerCapita: 18722.033 },
+        { country: "Croatia", gdpPerCapita: 25081.166 },
+        { country: "Cyprus", gdpPerCapita: 40551.733 },
+        { country: "Czech Republic", gdpPerCapita: 33038.228 },
+        { country: "Côte d'Ivoire", gdpPerCapita: 2901.813 },
+        { country: "Denmark", gdpPerCapita: 71966.691 },
+        { country: "Djibouti", gdpPerCapita: 4417.009 },
+        { country: "Dominica", gdpPerCapita: 9942.061 },
+        { country: "Dominican Republic", gdpPerCapita: 12451.947 },
+        { country: "Ecuador", gdpPerCapita: 6941.046 },
+        { country: "Egypt", gdpPerCapita: 3160.11 },
+        { country: "El Salvador", gdpPerCapita: 5892.503 },
+        { country: "Equatorial Guinea", gdpPerCapita: 7892.898 },
+        { country: "Estonia", gdpPerCapita: 33225.113 },
+        { country: "Eswatini", gdpPerCapita: 4561.871 },
+        { country: "Ethiopia", gdpPerCapita: 1108.105 },
+        { country: "Fiji", gdpPerCapita: 6550.83 },
+        { country: "Finland", gdpPerCapita: 57182.644 },
+        { country: "France", gdpPerCapita: 49526.711 },
+        { country: "Gabon", gdpPerCapita: 9094.46 },
+        { country: "Gambia, The", gdpPerCapita: 1074.431 },
+        { country: "Georgia", gdpPerCapita: 9612.524 },
+        { country: "Germany", gdpPerCapita: 57914.356 },
+        { country: "Ghana", gdpPerCapita: 2189.284 },
+        { country: "Greece", gdpPerCapita: 25616.445 },
+        { country: "Grenada", gdpPerCapita: 12722.146 },
+        { country: "Guatemala", gdpPerCapita: 6682.416 },
+        { country: "Guinea", gdpPerCapita: 1727.219 },
+        { country: "Guinea-Bissau", gdpPerCapita: 1166.355 },
+        { country: "Guyana", gdpPerCapita: 30650.092 },
+        { country: "Haiti", gdpPerCapita: 2434.525 },
+        { country: "Honduras", gdpPerCapita: 3594.081 },
+        { country: "Hong Kong SAR", gdpPerCapita: 55608.095 },
+        { country: "Hungary", gdpPerCapita: 25703.442 },
+        { country: "Iceland", gdpPerCapita: 90111.334 },
+        { country: "India", gdpPerCapita: 2936.823 },
+        { country: "Indonesia", gdpPerCapita: 5247.591 },
+        { country: "Iran", gdpPerCapita: 5299.982 },
+        { country: "Iraq", gdpPerCapita: 5950.59 },
+        { country: "Ireland", gdpPerCapita: 107242.999 },
+        { country: "Israel", gdpPerCapita: 54369.758 },
+        { country: "Italy", gdpPerCapita: 41714.411 },
+        { country: "Jamaica", gdpPerCapita: 7841.249 },
+        { country: "Japan", gdpPerCapita: 35611.138 },
+        { country: "Jordan", gdpPerCapita: 4904.036 },
+        { country: "Kazakhstan", gdpPerCapita: 15112.239 },
+        { country: "Kenya", gdpPerCapita: 2186.578 },
+        { country: "Kiribati", gdpPerCapita: 2578.422 },
+        { country: "Korea, Republic of", gdpPerCapita: 37674.85 },
+        { country: "Kosovo", gdpPerCapita: 6708.954 },
+        { country: "Kuwait", gdpPerCapita: 31681.846 },
+        { country: "Kyrgyz Republic", gdpPerCapita: 2405.246 },
+        { country: "Lao P.D.R.", gdpPerCapita: 1854.184 },
+        { country: "Latvia", gdpPerCapita: 25681.018 },
+        { country: "Lesotho", gdpPerCapita: 1106.795 },
+        { country: "Liberia", gdpPerCapita: 887.426 },
+        { country: "Libya", gdpPerCapita: 6874.384 },
+        { country: "Lithuania", gdpPerCapita: 30513.583 },
+        { country: "Luxembourg", gdpPerCapita: 141079.52 },
+        { country: "Macao SAR", gdpPerCapita: 84276.032 },
+        { country: "Madagascar", gdpPerCapita: 575.742 },
+        { country: "Malawi", gdpPerCapita: 448.289 },
+        { country: "Malaysia", gdpPerCapita: 14423.065 },
+        { country: "Maldives", gdpPerCapita: 18599.207 },
+        { country: "Mali", gdpPerCapita: 933.147 },
+        { country: "Malta", gdpPerCapita: 46644.353 },
+        { country: "Marshall Islands", gdpPerCapita: 7150.778 },
+        { country: "Mauritania", gdpPerCapita: 2393.647 },
+        { country: "Mauritius", gdpPerCapita: 13098.934 },
+        { country: "Mexico", gdpPerCapita: 13630.15 },
+        { country: "Micronesia, Fed. States of", gdpPerCapita: 5363.506 },
+        { country: "Moldova", gdpPerCapita: 8161.296 },
+        { country: "Mongolia", gdpPerCapita: 7576.313 },
+        { country: "Montenegro", gdpPerCapita: 13961.47 },
+        { country: "Morocco", gdpPerCapita: 4470.641 },
+        { country: "Mozambique", gdpPerCapita: 684.966 },
+        { country: "Myanmar", gdpPerCapita: 1186.523 },
+        { country: "Namibia", gdpPerCapita: 4710.76 },
+        { country: "Nauru", gdpPerCapita: 13475.957 },
+        { country: "Nepal", gdpPerCapita: 1486.461 },
+        { country: "Netherlands", gdpPerCapita: 70605.529 },
+        { country: "New Zealand", gdpPerCapita: 48234.145 },
+        { country: "Nicaragua", gdpPerCapita: 3074.454 },
+        { country: "Niger", gdpPerCapita: 752.146 },
+        { country: "Nigeria", gdpPerCapita: 835.488 },
+        { country: "North Macedonia", gdpPerCapita: 9439.426 },
+        { country: "Norway", gdpPerCapita: 90320.006 },
+        { country: "Oman", gdpPerCapita: 20230.482 },
+        { country: "Palau", gdpPerCapita: 20087.605 },
+        { country: "Panama", gdpPerCapita: 20092.051 },
+        { country: "Papua New Guinea", gdpPerCapita: 2549.511 },
+        { country: "Paraguay", gdpPerCapita: 6032.681 },
+        { country: "Peru", gdpPerCapita: 8570.382 },
+        { country: "Philippines", gdpPerCapita: 4438.704 },
+        { country: "Poland", gdpPerCapita: 25040.597 },
+        { country: "Portugal", gdpPerCapita: 30946.811 },
+        { country: "Puerto Rico", gdpPerCapita: 38514.52 },
+        { country: "Qatar", gdpPerCapita: 72759.508 },
+        { country: "Romania", gdpPerCapita: 21570.103 },
+        { country: "Russian Federation", gdpPerCapita: 15077.117 },
+        { country: "Rwanda", gdpPerCapita: 990.116 },
+        { country: "Saint Kitts and Nevis", gdpPerCapita: 25514.123 },
+        { country: "Saint Lucia", gdpPerCapita: 14561.009 },
+        { country: "Saint Vincent and the Grenadines", gdpPerCapita: 11193.648 },
+        { country: "Samoa", gdpPerCapita: 5350.259 },
+        { country: "San Marino", gdpPerCapita: 61518.315 },
+        { country: "Saudi Arabia", gdpPerCapita: 33287.244 },
+        { country: "Senegal", gdpPerCapita: 1971.701 },
+        { country: "Serbia", gdpPerCapita: 13490.034 },
+        { country: "Seychelles", gdpPerCapita: 22001.423 },
+        { country: "Sierra Leone", gdpPerCapita: 883.486 },
+        { country: "Singapore", gdpPerCapita: 93956.009 },
+        { country: "Slovak Republic", gdpPerCapita: 28176.905 },
+        { country: "Slovenia", gdpPerCapita: 36495.357 },
+        { country: "Solomon Islands", gdpPerCapita: 2299.604 },
+        { country: "Somalia", gdpPerCapita: 818.653 },
+        { country: "South Africa", gdpPerCapita: 6517.088 },
+        { country: "South Sudan, Republic of", gdpPerCapita: 334.14 },
+        { country: "Spain", gdpPerCapita: 37361.964 },
+        { country: "Sudan", gdpPerCapita: 594.903 },
+        { country: "Suriname", gdpPerCapita: 7544.681 },
+        { country: "Sweden", gdpPerCapita: 59508.263 },
+        { country: "Switzerland", gdpPerCapita: 111716.018 },
+        { country: "São Tomé and Príncipe", gdpPerCapita: 3933.156 },
+        { country: "Taiwan Province of China", gdpPerCapita: 34924.211 },
+        { country: "Tajikistan", gdpPerCapita: 1367.091 },
+        { country: "Tanzania", gdpPerCapita: 1272.459 },
+        { country: "Thailand", gdpPerCapita: 7754.143 },
+        { country: "Timor-Leste", gdpPerCapita: 1532.855 },
+        { country: "Togo", gdpPerCapita: 1099.251 },
+        { country: "Tonga", gdpPerCapita: 5756.527 },
+        { country: "Trinidad and Tobago", gdpPerCapita: 20376.315 },
+        { country: "Tunisia", gdpPerCapita: 4396.179 },
+        { country: "Turkmenistan", gdpPerCapita: 13656.608 },
+        { country: "Tuvalu", gdpPerCapita: 7712.927 },
+        { country: "Türkiye, Republic of", gdpPerCapita: 16876.538 },
+        { country: "Uganda", gdpPerCapita: 1303.888 },
+        { country: "Ukraine", gdpPerCapita: 5758.992 },
+        { country: "United Arab Emirates", gdpPerCapita: 51294.323 },
+        { country: "United Kingdom", gdpPerCapita: 54279.939 },
+        { country: "United States", gdpPerCapita: 89677.894 },
+        { country: "Uruguay", gdpPerCapita: 24080.444 },
+        { country: "Uzbekistan", gdpPerCapita: 3379.399 },
+        { country: "Vanuatu", gdpPerCapita: 3400.513 },
+        { country: "Venezuela", gdpPerCapita: 4121.901 },
+        { country: "Vietnam", gdpPerCapita: 4985.933 },
+        { country: "Yemen", gdpPerCapita: 455.459 },
+        { country: "Zambia", gdpPerCapita: 1466.458 },
+        { country: "Zimbabwe", gdpPerCapita: 2127.493 }
+    ];
+    
+    try {
+        // If a country query is provided, find the GDP per capita for that country
+        if (countryQuery) {
+            const decodedCountry = decodeURIComponent(countryQuery).toLowerCase();
+
+            const match = gdpPerCapita2025.find(
+                (c) => c.country.toLowerCase() === decodedCountry
+            );
+
+            if (match) {
+                return NextResponse.json([match.gdpPerCapita]);
+            } else {
+                return NextResponse.json(
+                    { error: `No GDP data found for "${countryQuery}"` },
+                    { status: 404 }
+                );
+            }
+        }
+
+        // If no country query, filter countries based on minimum wage
+        let countries = [];
+
+        for (let i = 0; i < gdpPerCapita2025.length; i++) {
+            const countryData = gdpPerCapita2025[i];
+            if (countryData.gdpPerCapita >= minWage) {
+                countries.push(countryData.country);
+            }
+        }
+
+        countries.sort(); // Sort countries alphabetically
+        return NextResponse.json(countries);
+    } catch (error) {
+        console.error("Error fetching wage data:", error);
+        return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+}
