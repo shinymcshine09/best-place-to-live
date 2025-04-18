@@ -4,39 +4,212 @@ import * as cheerio from 'cheerio';
 
 export async function GET(req) {
     const { searchParams } = new URL(req.url);
-    const avgRainfall = parseFloat(searchParams.get('q4')) || 0; // Get average rainfall
+    const reqRainfall = parseFloat(searchParams.get('q4')) || 0; // Get average rainfall
     const countryName = searchParams.get('country'); // Get country name
 
-    console.log("Country name:", countryName);
+    const rainfallData = [
+        { country: "Colombia", mmPerYear: 3240 },
+        { country: "Sao Tome and Principe", mmPerYear: 3200 },
+        { country: "Tuvalu", mmPerYear: 3200 },
+        { country: "Papua New Guinea", mmPerYear: 3142 },
+        { country: "Solomon Islands", mmPerYear: 3028 },
+        { country: "Panama", mmPerYear: 2928 },
+        { country: "Costa Rica", mmPerYear: 2926 },
+        { country: "Samoa", mmPerYear: 2880 },
+        { country: "Malaysia", mmPerYear: 2875 },
+        { country: "Brunei", mmPerYear: 2722 },
+        { country: "Indonesia", mmPerYear: 2702 },
+        { country: "Bangladesh", mmPerYear: 2666 },
+        { country: "Fiji", mmPerYear: 2592 },
+        { country: "Sierra Leone", mmPerYear: 2526 },
+        { country: "Singapore", mmPerYear: 2497 },
+        { country: "Liberia", mmPerYear: 2391 },
+        { country: "Guyana", mmPerYear: 2387 },
+        { country: "Grenada", mmPerYear: 2350 },
+        { country: "Philippines", mmPerYear: 2348 },
+        { country: "Suriname", mmPerYear: 2331 },
+        { country: "Seychelles", mmPerYear: 2330 },
+        { country: "Saint Lucia", mmPerYear: 2301 },
+        { country: "Nicaragua", mmPerYear: 2280 },
+        { country: "Ecuador", mmPerYear: 2274 },
+        { country: "Bhutan", mmPerYear: 2200 },
+        { country: "Trinidad and Tobago", mmPerYear: 2200 },
+        { country: "Equatorial Guinea", mmPerYear: 2156 },
+        { country: "Myanmar", mmPerYear: 2091 },
+        { country: "Dominica", mmPerYear: 2083 },
+        { country: "Puerto Rico", mmPerYear: 2054 },
+        { country: "Jamaica", mmPerYear: 2051 },
+        { country: "Venezuela", mmPerYear: 2044 },
+        { country: "Mauritius", mmPerYear: 2041 },
+        { country: "Vanuatu", mmPerYear: 2000 },
+        { country: "Guatemala", mmPerYear: 1996 },
+        { country: "Honduras", mmPerYear: 1976 },
+        { country: "Maldives", mmPerYear: 1972 },
+        { country: "Iceland", mmPerYear: 1940 },
+        { country: "Cambodia", mmPerYear: 1904 },
+        { country: "Laos", mmPerYear: 1834 },
+        { country: "Gabon", mmPerYear: 1831 },
+        { country: "Vietnam", mmPerYear: 1821 },
+        { country: "El Salvador", mmPerYear: 1784 },
+        { country: "Brazil", mmPerYear: 1761 },
+        { country: "Peru", mmPerYear: 1738 },
+        { country: "New Zealand", mmPerYear: 1732 },
+        { country: "Sri Lanka", mmPerYear: 1712 },
+        { country: "Belize", mmPerYear: 1705 },
+        { country: "Japan", mmPerYear: 1668 },
+        { country: "Guinea", mmPerYear: 1651 },
+        { country: "Congo", mmPerYear: 1646 },
+        { country: "Thailand", mmPerYear: 1622 },
+        { country: "Cameroon", mmPerYear: 1604 },
+        { country: "Saint Vincent and the Grenadines", mmPerYear: 1583 },
+        { country: "Guinea-Bissau", mmPerYear: 1577 },
+        { country: "DR Congo", mmPerYear: 1543 },
+        { country: "Switzerland", mmPerYear: 1537 },
+        { country: "Chile", mmPerYear: 1522 },
+        { country: "Madagascar", mmPerYear: 1513 },
+        { country: "Timor-Leste", mmPerYear: 1500 },
+        { country: "Nepal", mmPerYear: 1500 },
+        { country: "Albania", mmPerYear: 1485 },
+        { country: "Haiti", mmPerYear: 1440 },
+        { country: "Saint Kitts and Nevis", mmPerYear: 1427 },
+        { country: "Barbados", mmPerYear: 1422 },
+        { country: "Norway", mmPerYear: 1414 },
+        { country: "Dominican Republic", mmPerYear: 1410 },
+        { country: "Ivory Coast", mmPerYear: 1348 },
+        { country: "Central African Republic", mmPerYear: 1343 },
+        { country: "Cuba", mmPerYear: 1335 },
+        { country: "Uruguay", mmPerYear: 1300 },
+        { country: "Bahamas", mmPerYear: 1292 },
+        { country: "Burundi", mmPerYear: 1274 },
+        { country: "South Korea", mmPerYear: 1274 },
+        { country: "United Kingdom", mmPerYear: 1220 },
+        { country: "Rwanda", mmPerYear: 1212 },
+        { country: "Ghana", mmPerYear: 1187 },
+        { country: "Malawi", mmPerYear: 1181 },
+        { country: "Uganda", mmPerYear: 1180 },
+        { country: "Togo", mmPerYear: 1168 },
+        { country: "Slovenia", mmPerYear: 1162 },
+        { country: "Nigeria", mmPerYear: 1150 },
+        { country: "Bolivia", mmPerYear: 1146 },
+        { country: "Paraguay", mmPerYear: 1130 },
+        { country: "Ireland", mmPerYear: 1118 },
+        { country: "Croatia", mmPerYear: 1113 },
+        { country: "Austria", mmPerYear: 1110 },
+        { country: "India", mmPerYear: 1083 },
+        { country: "Tanzania", mmPerYear: 1071 },
+        { country: "North Korea", mmPerYear: 1054 },
+        { country: "Benin", mmPerYear: 1039 },
+        { country: "Mozambique", mmPerYear: 1032 },
+        { country: "Antigua and Barbuda", mmPerYear: 1030 },
+        { country: "Bosnia and Herzegovina", mmPerYear: 1028 },
+        { country: "Georgia", mmPerYear: 1026 },
+        { country: "Zambia", mmPerYear: 1020 },
+        { country: "Angola", mmPerYear: 1010 },
+        { country: "Luxembourg", mmPerYear: 934 },
+        { country: "Comoros", mmPerYear: 900 },
+        { country: "South Sudan", mmPerYear: 900 },
+        { country: "France", mmPerYear: 867 },
+        { country: "Portugal", mmPerYear: 854 },
+        { country: "Ethiopia", mmPerYear: 848 },
+        { country: "Belgium", mmPerYear: 847 },
+        { country: "Gambia", mmPerYear: 836 },
+        { country: "Italy", mmPerYear: 832 },
+        { country: "Slovakia", mmPerYear: 824 },
+        { country: "Eswatini", mmPerYear: 788 },
+        { country: "Lesotho", mmPerYear: 788 },
+        { country: "Netherlands", mmPerYear: 778 },
+        { country: "Mexico", mmPerYear: 758 },
+        { country: "Burkina Faso", mmPerYear: 748 },
+        { country: "United States", mmPerYear: 715 },
+        { country: "Denmark", mmPerYear: 703 },
+        { country: "Germany", mmPerYear: 700 },
+        { country: "Tajikistan", mmPerYear: 691 },
+        { country: "Senegal", mmPerYear: 686 },
+        { country: "Czech Republic", mmPerYear: 677 },
+        { country: "Latvia", mmPerYear: 667 },
+        { country: "Lebanon", mmPerYear: 661 },
+        { country: "Zimbabwe", mmPerYear: 657 },
+        { country: "Lithuania", mmPerYear: 656 },
+        { country: "Greece", mmPerYear: 652 },
+        { country: "China", mmPerYear: 645 },
+        { country: "Romania", mmPerYear: 637 },
+        { country: "Spain", mmPerYear: 636 },
+        { country: "Kenya", mmPerYear: 630 },
+        { country: "Estonia", mmPerYear: 626 },
+        { country: "Sweden", mmPerYear: 624 },
+        { country: "North Macedonia", mmPerYear: 619 },
+        { country: "Belarus", mmPerYear: 618 },
+        { country: "Bulgaria", mmPerYear: 608 },
+        { country: "Poland", mmPerYear: 600 },
+        { country: "Turkey", mmPerYear: 593 },
+        { country: "Argentina", mmPerYear: 591 },
+        { country: "Hungary", mmPerYear: 589 },
+        { country: "Ukraine", mmPerYear: 565 },
+        { country: "Armenia", mmPerYear: 562 },
+        { country: "Malta", mmPerYear: 560 },
+        { country: "Canada", mmPerYear: 537 },
+        { country: "Finland", mmPerYear: 536 },
+        { country: "Australia", mmPerYear: 534 },
+        { country: "Kyrgyzstan", mmPerYear: 533 },
+        { country: "Cyprus", mmPerYear: 498 },
+        { country: "South Africa", mmPerYear: 495 },
+        { country: "Pakistan", mmPerYear: 494 },
+        { country: "Russia", mmPerYear: 460 },
+        { country: "Moldova", mmPerYear: 450 },
+        { country: "Azerbaijan", mmPerYear: 447 },
+        { country: "Israel", mmPerYear: 435 },
+        { country: "Botswana", mmPerYear: 416 },
+        { country: "Palestine", mmPerYear: 402 },
+        { country: "Eritrea", mmPerYear: 384 },
+        { country: "Morocco", mmPerYear: 346 },
+        { country: "Afghanistan", mmPerYear: 327 },
+        { country: "Chad", mmPerYear: 322 },
+        { country: "Namibia", mmPerYear: 285 },
+        { country: "Mali", mmPerYear: 282 },
+        { country: "Somalia", mmPerYear: 282 },
+        { country: "Syria", mmPerYear: 252 },
+        { country: "Kazakhstan", mmPerYear: 250 },
+        { country: "Sudan", mmPerYear: 250 },
+        { country: "Mongolia", mmPerYear: 241 },
+        { country: "Cape Verde", mmPerYear: 228 },
+        { country: "Iran", mmPerYear: 228 },
+        { country: "Djibouti", mmPerYear: 220 },
+        { country: "Iraq", mmPerYear: 216 },
+        { country: "Tunisia", mmPerYear: 207 },
+        { country: "Uzbekistan", mmPerYear: 206 },
+        { country: "Yemen", mmPerYear: 167 },
+        { country: "Turkmenistan", mmPerYear: 161 },
+        { country: "Niger", mmPerYear: 151 },
+        { country: "Oman", mmPerYear: 125 },
+        { country: "Kuwait", mmPerYear: 121 },
+        { country: "Jordan", mmPerYear: 111 },
+        { country: "Mauritania", mmPerYear: 92 },
+        { country: "Algeria", mmPerYear: 89 },
+        { country: "Bahrain", mmPerYear: 83 },
+        { country: "United Arab Emirates", mmPerYear: 78 },
+        { country: "Qatar", mmPerYear: 74 },
+        { country: "Saudi Arabia", mmPerYear: 59 },
+        { country: "Libya", mmPerYear: 56 },
+        { country: "Egypt", mmPerYear: 18 }
+    ];
 
-    let countryNameRainfall = [];
+    let countryNameRainfall;
 
     try {
-        const page = await wiki().page('List of countries by average annual precipitation');
-        const html = await page.html(); // Get raw HTML
-        const $ = cheerio.load(html); // Load into Cheerio
-
         let countries = [];
 
-        // Select the first Wikipedia table
-        $("table.wikitable").eq(0).find("tbody tr").each((index, element) => {
-            const columns = $(element).find("td");
+        for (const data of rainfallData) {
+            const { country, mmPerYear } = data;
 
-            if (columns.length > 1) { // Ensure it's not an empty row
-                const country = $(columns[1]).text().trim(); // Clean country name
-
-                const countriesRainfall = parseFloat($(columns[2]).text().replace(',', '')) || 0; // Extract and clean rainfall
-
-
-                if (countryName && countryName == country) {
-                    countryNameRainfall.push(countriesRainfall);
-                }
-
-                if (countriesRainfall > avgRainfall - 100 && countriesRainfall < avgRainfall + 1100) {
-                    countries.push(country); // Store only country name
-                }
+            if (countryName && countryName === country) {
+                countryNameRainfall = mmPerYear;
+                break; // Exit loop if country is found
             }
-        });
+
+            if (mmPerYear > reqRainfall && mmPerYear < reqRainfall + 1000) {
+                countries.push(country); // Store only country name
+            }
+        }
 
         if (countryNameRainfall) {
             return NextResponse.json(countryNameRainfall);

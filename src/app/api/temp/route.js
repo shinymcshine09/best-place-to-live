@@ -1,45 +1,271 @@
 import { NextResponse } from 'next/server';
-import wiki from 'wikijs';
-import * as cheerio from 'cheerio';
 
 export async function GET(req) {
     const { searchParams } = new URL(req.url);
     const avgTemp = parseFloat(searchParams.get('q1')) || 0; // Convert to number
     const countryName = searchParams.get('country'); // Get country name
 
-    const avgTempC = (avgTemp - 32) * 5 / 9; // Convert to Celsius
+    const countryTemperatures = [
+        { country: "Burkina Faso", celsius: 30.40, fahrenheit: 86.72 },
+        { country: "Mali", celsius: 29.21, fahrenheit: 84.58 },
+        { country: "Aruba", celsius: 29.17, fahrenheit: 84.51 },
+        { country: "Senegal", celsius: 28.90, fahrenheit: 84.02 },
+        { country: "Mauritania", celsius: 28.82, fahrenheit: 83.88 },
+        { country: "Tokelau", celsius: 28.71, fahrenheit: 83.68 },
+        { country: "Tuvalu", celsius: 28.62, fahrenheit: 83.52 },
+        { country: "Djibouti", celsius: 28.49, fahrenheit: 83.28 },
+        { country: "Curaçao", celsius: 28.40, fahrenheit: 83.12 },
+        { country: "Gambia", celsius: 28.38, fahrenheit: 83.08 },
+        { country: "United Arab Emirates", celsius: 28.17, fahrenheit: 82.71 },
+        { country: "Maldives", celsius: 28.11, fahrenheit: 82.60 },
+        { country: "Niger", celsius: 28.04, fahrenheit: 82.47 },
+        { country: "Benin", celsius: 28.02, fahrenheit: 82.44 },
+        { country: "Qatar", celsius: 28.02, fahrenheit: 82.44 },
+        { country: "Marshall Islands", celsius: 28.01, fahrenheit: 82.42 },
+        { country: "Guinea-Bissau", celsius: 27.98, fahrenheit: 82.36 },
+        { country: "South Sudan", celsius: 27.97, fahrenheit: 82.35 },
+        { country: "Sudan", celsius: 27.95, fahrenheit: 82.31 },
+        { country: "Palau", celsius: 27.90, fahrenheit: 82.22 },
+        { country: "Nauru", celsius: 27.83, fahrenheit: 82.09 },
+        { country: "Cayman Islands", celsius: 27.82, fahrenheit: 82.08 },
+        { country: "Guam", celsius: 27.81, fahrenheit: 82.06 },
+        { country: "Kiribati", celsius: 27.77, fahrenheit: 81.99 },
+        { country: "Anguilla", celsius: 27.71, fahrenheit: 81.88 },
+        { country: "Saint Martin", celsius: 27.71, fahrenheit: 81.88 },
+        { country: "Sint Maarten", celsius: 27.71, fahrenheit: 81.88 },
+        { country: "Bahrain", celsius: 27.69, fahrenheit: 81.84 },
+        { country: "Singapore", celsius: 27.68, fahrenheit: 81.82 },
+        { country: "Ghana", celsius: 27.66, fahrenheit: 81.79 },
+        { country: "Oman", celsius: 27.64, fahrenheit: 81.75 },
+        { country: "Chad", celsius: 27.63, fahrenheit: 81.73 },
+        { country: "British Indian Ocean Territory", celsius: 27.61, fahrenheit: 81.70 },
+        { country: "Northern Mariana Islands", celsius: 27.60, fahrenheit: 81.68 },
+        { country: "Samoa", celsius: 27.58, fahrenheit: 81.64 },
+        { country: "Caribbean Netherlands", celsius: 27.47, fahrenheit: 81.45 },
+        { country: "Saint Kitts and Nevis", celsius: 27.47, fahrenheit: 81.45 },
+        { country: "Cambodia", celsius: 27.41, fahrenheit: 81.34 },
+        { country: "American Samoa", celsius: 27.38, fahrenheit: 81.28 },
+        { country: "Togo", celsius: 27.33, fahrenheit: 81.19 },
+        { country: "Nigeria", celsius: 27.30, fahrenheit: 81.14 },
+        { country: "Wallis and Futuna", celsius: 27.30, fahrenheit: 81.14 },
+        { country: "Federated States of Micronesia", celsius: 27.28, fahrenheit: 81.10 },
+        { country: "Sri Lanka", celsius: 27.25, fahrenheit: 81.05 },
+        { country: "Antigua and Barbuda", celsius: 27.20, fahrenheit: 80.96 },
+        { country: "Seychelles", celsius: 27.09, fahrenheit: 80.76 },
+        { country: "Saint Lucia", celsius: 27.00, fahrenheit: 80.60 },
+        { country: "United States Virgin Islands", celsius: 26.98, fahrenheit: 80.56 },
+        { country: "Brunei", celsius: 26.95, fahrenheit: 80.51 },
+        { country: "Somalia", celsius: 26.95, fahrenheit: 80.51 },
+        { country: "Thailand", celsius: 26.85, fahrenheit: 80.33 },
+        { country: "Dominica", celsius: 26.83, fahrenheit: 80.29 },
+        { country: "Ivory Coast", celsius: 26.80, fahrenheit: 80.24 },
+        { country: "Cocos (Keeling) Islands", celsius: 26.79, fahrenheit: 80.22 },
+        { country: "British Virgin Islands", celsius: 26.70, fahrenheit: 80.06 },
+        { country: "Eritrea", celsius: 26.63, fahrenheit: 79.93 },
+        { country: "Barbados", celsius: 26.61, fahrenheit: 79.90 },
+        { country: "Suriname", celsius: 26.58, fahrenheit: 79.84 },
+        { country: "Trinidad and Tobago", celsius: 26.55, fahrenheit: 79.79 },
+        { country: "Sierra Leone", celsius: 26.54, fahrenheit: 79.77 },
+        { country: "Grenada", celsius: 26.49, fahrenheit: 79.68 },
+        { country: "Malaysia", celsius: 26.38, fahrenheit: 79.48 },
+        { country: "Kuwait", celsius: 26.31, fahrenheit: 79.36 },
+        { country: "Turks and Caicos Islands", celsius: 26.29, fahrenheit: 79.32 },
+        { country: "Philippines", celsius: 26.27, fahrenheit: 79.29 },
+        { country: "Saint Vincent and the Grenadines", celsius: 26.17, fahrenheit: 79.11 },
+        { country: "Guyana", celsius: 26.12, fahrenheit: 79.02 },
+        { country: "Christmas Island", celsius: 26.06, fahrenheit: 78.91 },
+        { country: "Indonesia", celsius: 25.96, fahrenheit: 78.73 },
+        { country: "Saudi Arabia", celsius: 25.94, fahrenheit: 78.69 },
+        { country: "Solomon Islands", celsius: 25.92, fahrenheit: 78.66 },
+        { country: "Jamaica", celsius: 25.91, fahrenheit: 78.64 },
+        { country: "Nicaragua", celsius: 25.88, fahrenheit: 78.58 },
+        { country: "Guinea", celsius: 25.86, fahrenheit: 78.55 },
+        { country: "Cuba", celsius: 25.81, fahrenheit: 78.46 },
+        { country: "Montserrat", celsius: 25.75, fahrenheit: 78.35 },
+        { country: "Bangladesh", celsius: 25.71, fahrenheit: 78.28 },
+        { country: "Venezuela", celsius: 25.71, fahrenheit: 78.28 },
+        { country: "Belize", celsius: 25.70, fahrenheit: 78.26 },
+        { country: "Panama", celsius: 25.60, fahrenheit: 78.08 },
+        { country: "Bahamas", celsius: 25.58, fahrenheit: 78.04 },
+        { country: "Yemen", celsius: 25.54, fahrenheit: 77.97 },
+        { country: "Central African Republic", celsius: 25.47, fahrenheit: 77.85 },
+        { country: "Liberia", celsius: 25.45, fahrenheit: 77.81 },
+        { country: "Brazil", celsius: 25.44, fahrenheit: 77.79 },
+        { country: "El Salvador", celsius: 25.23, fahrenheit: 77.41 },
+        { country: "Gabon", celsius: 25.20, fahrenheit: 77.36 },
+        { country: "Kenya", celsius: 25.08, fahrenheit: 77.14 },
+        { country: "Puerto Rico", celsius: 25.04, fahrenheit: 77.07 },
+        { country: "Niue", celsius: 25.03, fahrenheit: 77.05 },
+        { country: "Tonga", celsius: 25.01, fahrenheit: 77.02 },
+        { country: "Colombia", celsius: 25.00, fahrenheit: 77.00 },
+        { country: "United States Minor Outlying Islands", celsius: 24.97, fahrenheit: 76.95 },
+        { country: "Haiti", celsius: 24.95, fahrenheit: 76.91 },
+        { country: "India", celsius: 24.94, fahrenheit: 76.89 },
+        { country: "Costa Rica", celsius: 24.83, fahrenheit: 76.69 },
+        { country: "Cameroon", celsius: 24.80, fahrenheit: 76.64 },
+        { country: "Vietnam", celsius: 24.79, fahrenheit: 76.62 },
+        { country: "Republic of the Congo", celsius: 24.74, fahrenheit: 76.53 },
+        { country: "Papua New Guinea", celsius: 24.74, fahrenheit: 76.53 },
+        { country: "Honduras", celsius: 24.72, fahrenheit: 76.50 },
+        { country: "Cook Islands", celsius: 24.71, fahrenheit: 76.48 },
+        { country: "Fiji", celsius: 24.68, fahrenheit: 76.42 },
+        { country: "Equatorial Guinea", celsius: 24.66, fahrenheit: 76.39 },
+        { country: "Timor-Leste", celsius: 24.57, fahrenheit: 76.23 },
+        { country: "Dominican Republic", celsius: 24.55, fahrenheit: 76.19 },
+        { country: "São Tomé and Príncipe", celsius: 24.49, fahrenheit: 76.08 },
+        { country: "Vanuatu", celsius: 24.44, fahrenheit: 75.99 },
+        { country: "Mozambique", celsius: 24.41, fahrenheit: 75.94 },
+        { country: "Democratic Republic of the Congo", celsius: 24.35, fahrenheit: 75.83 },
+        { country: "French Polynesia", celsius: 24.30, fahrenheit: 75.74 },
+        { country: "Laos", celsius: 24.16, fahrenheit: 75.49 },
+        { country: "Paraguay", celsius: 23.92, fahrenheit: 75.06 },
+        { country: "Myanmar", celsius: 23.82, fahrenheit: 74.88 },
+        { country: "Comoros", celsius: 23.73, fahrenheit: 74.71 },
+        { country: "Guatemala", celsius: 23.65, fahrenheit: 74.57 },
+        { country: "Algeria", celsius: 23.60, fahrenheit: 74.48 },
+        { country: "Ethiopia", celsius: 23.36, fahrenheit: 74.05 },
+        { country: "Mauritius", celsius: 23.33, fahrenheit: 73.99 },
+        { country: "Uganda", celsius: 23.25, fahrenheit: 73.85 },
+        { country: "Egypt", celsius: 23.14, fahrenheit: 73.65 },
+        { country: "Iraq", celsius: 22.95, fahrenheit: 73.31 },
+        { country: "Tanzania", celsius: 22.92, fahrenheit: 73.26 },
+        { country: "Libya", celsius: 22.81, fahrenheit: 73.06 },
+        { country: "New Caledonia", celsius: 22.69, fahrenheit: 72.84 },
+        { country: "Malawi", celsius: 22.66, fahrenheit: 72.79 },
+        { country: "Madagascar", celsius: 22.64, fahrenheit: 72.75 },
+        { country: "Cape Verde", celsius: 22.53, fahrenheit: 72.55 },
+        { country: "Zambia", celsius: 22.23, fahrenheit: 72.01 },
+        { country: "Botswana", celsius: 22.09, fahrenheit: 71.76 },
+        { country: "Australia", celsius: 22.05, fahrenheit: 71.69 },
+        { country: "Zimbabwe", celsius: 21.90, fahrenheit: 71.42 },
+        { country: "Angola", celsius: 21.77, fahrenheit: 71.19 },
+        { country: "Bermuda", celsius: 21.67, fahrenheit: 71.01 },
+        { country: "Ecuador", celsius: 21.43, fahrenheit: 70.57 },
+        { country: "Pakistan", celsius: 21.38, fahrenheit: 70.48 },
+        { country: "Mexico", celsius: 21.31, fahrenheit: 70.36 },
+        { country: "Bolivia", celsius: 20.76, fahrenheit: 69.37 },
+        { country: "Eswatini", celsius: 20.64, fahrenheit: 69.15 },
+        { country: "Pitcairn Islands", celsius: 20.56, fahrenheit: 69.01 },
+        { country: "Tunisia", celsius: 20.53, fahrenheit: 68.95 },
+        { country: "Burundi", celsius: 20.51, fahrenheit: 68.92 },
+        { country: "Namibia", celsius: 20.45, fahrenheit: 68.81 },
+        { country: "Israel", celsius: 20.99, fahrenheit: 69.78 },
+        { country: "Peru", celsius: 20.07, fahrenheit: 68.13 },
+        { country: "Malta", celsius: 20.06, fahrenheit: 68.11 },
+        { country: "Jordan", celsius: 20.05, fahrenheit: 68.09 },
+        { country: "Palestine", celsius: 20.04, fahrenheit: 68.07 },
+        { country: "Rwanda", celsius: 20.03, fahrenheit: 68.05 },
+        { country: "Norfolk Island", celsius: 20.02, fahrenheit: 68.04 },
+        { country: "Cyprus", celsius: 20.01, fahrenheit: 68.02 },
+        { country: "Syria", celsius: 18.75, fahrenheit: 65.75 },
+        { country: "Iran", celsius: 18.34, fahrenheit: 65.01 },
+        { country: "South Africa", celsius: 18.23, fahrenheit: 64.81 },
+        { country: "Gibraltar", celsius: 18.15, fahrenheit: 64.67 },
+        { country: "Morocco", celsius: 18.14, fahrenheit: 64.65 },
+        { country: "Saint Helena, Ascension and Tristan da Cunha", celsius: 18.10, fahrenheit: 64.58 },
+        { country: "Uruguay", celsius: 17.97, fahrenheit: 64.35 },
+        { country: "Turkmenistan", celsius: 16.66, fahrenheit: 61.99 },
+        { country: "Argentina", celsius: 16.30, fahrenheit: 61.34 },
+        { country: "Portugal", celsius: 15.85, fahrenheit: 60.53 },
+        { country: "Lebanon", celsius: 15.45, fahrenheit: 59.81 },
+        { country: "Vatican City", celsius: 15.20, fahrenheit: 59.36 },
+        { country: "Greece", celsius: 13.17, fahrenheit: 55.71 },
+        { country: "Spain", celsius: 13.07, fahrenheit: 55.53 },
+        { country: "Uzbekistan", celsius: 13.06, fahrenheit: 55.51 },
+        { country: "Monaco", celsius: 13.05, fahrenheit: 55.49 },
+        { country: "Afghanistan", celsius: 13.04, fahrenheit: 55.47 },
+        { country: "Italy", celsius: 13.02, fahrenheit: 55.44 },
+        { country: "Azerbaijan", celsius: 12.96, fahrenheit: 55.33 },
+        { country: "San Marino", celsius: 12.83, fahrenheit: 55.09 },
+        { country: "Albania", celsius: 12.44, fahrenheit: 54.39 },
+        { country: "Lesotho", celsius: 12.38, fahrenheit: 54.28 },
+        { country: "Jersey", celsius: 12.27, fahrenheit: 54.09 },
+        { country: "South Korea", celsius: 12.22, fahrenheit: 54.00 },
+        { country: "Guernsey", celsius: 12.09, fahrenheit: 53.76 },
+        { country: "Croatia", celsius: 11.96, fahrenheit: 53.53 },
+        { country: "Japan", celsius: 11.78, fahrenheit: 53.20 },
+        { country: "Turkey", celsius: 11.66, fahrenheit: 52.99 },
+        { country: "France", celsius: 11.65, fahrenheit: 52.97 },
+        { country: "Hungary", celsius: 11.50, fahrenheit: 52.70 },
+        { country: "Serbia", celsius: 11.40, fahrenheit: 52.52 },
+        { country: "Bulgaria", celsius: 11.35, fahrenheit: 52.43 },
+        { country: "Moldova", celsius: 10.89, fahrenheit: 51.60 },
+        { country: "North Macedonia", celsius: 10.79, fahrenheit: 51.42 },
+        { country: "Belgium", celsius: 10.67, fahrenheit: 51.21 },
+        { country: "Netherlands", celsius: 10.49, fahrenheit: 50.88 },
+        { country: "New Zealand", celsius: 10.46, fahrenheit: 50.83 },
+        { country: "Bhutan", celsius: 10.38, fahrenheit: 50.68 },
+        { country: "Bosnia and Herzegovina", celsius: 10.35, fahrenheit: 50.63 },
+        { country: "Romania", celsius: 10.18, fahrenheit: 50.32 },
+        { country: "Kosovo", celsius: 10.02, fahrenheit: 50.04 },
+        { country: "Luxembourg", celsius: 10.02, fahrenheit: 50.04 },
+        { country: "Montenegro", celsius: 9.93, fahrenheit: 49.87 },
+        { country: "Slovenia", celsius: 9.86, fahrenheit: 49.75 },
+        { country: "Ireland", celsius: 9.73, fahrenheit: 49.51 },
+        { country: "Isle of Man", celsius: 9.65, fahrenheit: 49.37 },
+        { country: "Germany", celsius: 9.59, fahrenheit: 49.26 },
+        { country: "United States", celsius: 9.46, fahrenheit: 49.03 },
+        { country: "Chile", celsius: 9.39, fahrenheit: 48.90 },
+        { country: "Ukraine", celsius: 9.27, fahrenheit: 48.69 },
+        { country: "United Kingdom", celsius: 9.24, fahrenheit: 48.63 },
+        { country: "Georgia", celsius: 9.01, fahrenheit: 48.22 },
+        { country: "Denmark", celsius: 8.90, fahrenheit: 48.02 },
+        { country: "Slovakia", celsius: 8.83, fahrenheit: 47.89 },
+        { country: "Poland", celsius: 8.78, fahrenheit: 47.80 },
+        { country: "Czech Republic", celsius: 8.60, fahrenheit: 47.48 },
+        { country: "Andorra", celsius: 8.27, fahrenheit: 46.89 },
+        { country: "Armenia", celsius: 7.82, fahrenheit: 46.08 },
+        { country: "China", celsius: 7.59, fahrenheit: 45.66 },
+        { country: "Liechtenstein", celsius: 7.55, fahrenheit: 45.59 },
+        { country: "Belarus", celsius: 7.45, fahrenheit: 45.41 },
+        { country: "Austria", celsius: 7.44, fahrenheit: 45.39 },
+        { country: "Lithuania", celsius: 7.38, fahrenheit: 45.28 },
+        { country: "Kazakhstan", celsius: 7.11, fahrenheit: 44.80 },
+        { country: "North Korea", celsius: 6.98, fahrenheit: 44.56 },
+        { country: "Latvia", celsius: 6.87, fahrenheit: 44.37 },
+        { country: "Faroe Islands", celsius: 6.60, fahrenheit: 43.88 },
+        { country: "Switzerland", celsius: 6.47, fahrenheit: 43.65 },
+        { country: "Estonia", celsius: 6.34, fahrenheit: 43.41 },
+        { country: "Saint Pierre and Miquelon", celsius: 5.72, fahrenheit: 42.30 },
+        { country: "French Southern and Antarctic Lands", celsius: 4.11, fahrenheit: 39.40 },
+        { country: "Tajikistan", celsius: 3.85, fahrenheit: 38.93 },
+        { country: "Sweden", celsius: 3.23, fahrenheit: 37.81 },
+        { country: "Kyrgyzstan", celsius: 2.65, fahrenheit: 36.77 },
+        { country: "Finland", celsius: 2.46, fahrenheit: 36.43 },
+        { country: "Heard Island and McDonald Islands", celsius: 2.46, fahrenheit: 36.43 },
+        { country: "Norway", celsius: 2.21, fahrenheit: 35.98 },
+        { country: "Iceland", celsius: 1.85, fahrenheit: 35.33 },
+        { country: "Mongolia", celsius: 1.07, fahrenheit: 33.93 },
+        { country: "Russia", celsius: -3.79, fahrenheit: 25.18 },
+        { country: "Canada", celsius: -4.03, fahrenheit: 24.75 },
+        { country: "Svalbard and Jan Mayen", celsius: -6.78, fahrenheit: 19.80 },
+        { country: "Greenland", celsius: -18.68, fahrenheit: -1.62 }
+    ];
 
     try {
-        const page = await wiki().page('List of countries by average yearly temperature');
-        const html = await page.html(); // Get raw HTML
-        const $ = cheerio.load(html); // Load into Cheerio
-
         let countries = [];
 
-        let matchedCountry = null;
-
-        // Select the second Wikipedia table
-        $("table.wikitable").eq(0).find("tbody tr").each((index, element) => {
-            const columns = $(element).find("td");
-
-            if (columns.length > 1) { // Ensure it's not an empty row
-                const country = $(columns[1]).text().trim(); // Clean country name
-
-                const countriesAverageTemp = parseFloat($(columns[2]).text()) || 0; // Extract and clean temp
-
-                if (countryName && countryName == country) {
-                    matchedCountry = countriesAverageTemp;
+        if (countryName) {
+            let temps = [];
+            countryTemperatures.find(entry => {
+                if (entry.country === countryName) {
+                    temps.push(entry.celsius);
+                    temps.push(entry.fahrenheit);
                 }
+            });
 
-                if (countriesAverageTemp > avgTempC - 5 && countriesAverageTemp < avgTempC + 5) {
-                    countries.push(country); // Store only country name
-                }
+            if (temps.length === 0) {
+                return NextResponse.json({ error: "Country not found" }, { status: 404 });
             }
-        });
-
-        if (matchedCountry) {
-            return NextResponse.json(matchedCountry);
-        } 
+            return NextResponse.json({ celsius: temps[0], fahrenheit: temps[1] });
+        }
+        else {
+            countryTemperatures.forEach(entry => {
+                if (entry.celsius > avgTemp - 5 && entry.celsius < avgTemp + 5) {
+                    countries.push(entry.country);
+                }
+            });
+        }
 
         countries.sort(); // Sort countries alphabetically
         return NextResponse.json(countries);

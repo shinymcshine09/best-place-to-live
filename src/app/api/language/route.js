@@ -1,40 +1,21 @@
 import { NextResponse } from 'next/server';
-import wiki from 'wikijs';
-import * as cheerio from 'cheerio';
 
 export async function GET(req) {
     const { searchParams } = new URL(req.url);
     const language = searchParams.get('q5'); // Get language
 
     try {
-        const page = await wiki().page('List of official languages by country and territory');
-        const html = await page.html(); // Get raw HTML
-        const $ = cheerio.load(html); // Load into Cheerio
+        const res = await fetch("https://restcountries.com/v3.1/all")
+        const data = await res.json();
 
-        let countries = [];
+        const matchingCountries = data.filter(country =>
+            country.languages && Object.values(country.languages).includes(language)
+        );
 
-        // Select the first Wikipedia table
-        $("table.wikitable").eq(0).find("tbody tr").each((index, element) => {
-            const columns = $(element).find("td");
+        const countryNames = matchingCountries.map(country => country.name.common);
 
-            if (columns.length > 1) {
-                let country = $(columns[0]).text().trim().replace(/\[[^\]]+\]/g, ''); // Clean country name
-                
-                // Special case for "United Kingdom and Crown dependencies"
-                if (country.startsWith("United Kingdom")) {
-                    country = "United Kingdom";
-                }
-
-                const countriesLanguagesRaw = ($(columns[2]).text()) || '';
-                const countriesLanguages = countriesLanguagesRaw.split(',').map(lang => lang.trim());
-
-                if (countriesLanguages.some(lang => lang.toLowerCase() === language.toLowerCase())) {
-                    countries.push(country); // Store only country name
-                }
-            }
-        });
-
-        return NextResponse.json(countries);
+        countryNames.sort();
+        return NextResponse.json(countryNames);
     } catch (error) {
         console.error("Error fetching language data:", error);
         return NextResponse.json({ error: error.message }, { status: 500 });

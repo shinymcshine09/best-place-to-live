@@ -106,8 +106,6 @@ export default async function CountryPage({ params }) {
         console.error("Error fetching wiki summary:", error);
     }
 
-    // console.log("Wiki Intro:", intro);
-
     let imageUrls;
 
     try {
@@ -195,7 +193,7 @@ export default async function CountryPage({ params }) {
                         }) : 'N/A'}
                     </p>
                     <p>
-                        Average temperature: {avTemp ? `${((avTemp * (9/5)) + 32).toLocaleString(undefined, { maximumFractionDigits: 2 })} F° (${avTemp} C°)`: 'N/A'}
+                        Average temperature: {avTemp ? `${avTemp.fahrenheit} F° (${avTemp.celsius} C°)`: 'N/A'}
                     </p>
                     <p>
                         Sun hours annually: {sunHours ? sunHours.toLocaleString(undefined, { maximumFractionDigits: 0 }) : 'N/A'}
