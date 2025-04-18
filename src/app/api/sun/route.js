@@ -194,7 +194,7 @@ export async function GET(req) {
         if (countrysSunHours.length > 0) {
             const average = countrysSunHours.reduce((sum, num) => sum + num, 0) / countrysSunHours.length;
 
-            return NextResponse.json(average); // Return average sun hours
+            return NextResponse.json([average]); // Return average sun hours
         }
 
         countries.sort(); // Sort countries alphabetically

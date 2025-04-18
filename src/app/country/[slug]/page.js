@@ -134,10 +134,6 @@ export default async function CountryPage({ params }) {
                 .filter(item => item.title.startsWith("File:"))
                 .map(item => item.title);
 
-            if (imageTitles.length === 0) {
-                console.log("No image files found.");
-            }
-
             const titlesParam = imageTitles.map(encodeURIComponent).join('|');
             const imageInfoRes = await fetch(`https://commons.wikimedia.org/w/api.php?action=query&format=json&prop=imageinfo&iiprop=url&titles=${titlesParam}&origin=*`);
             const imageInfoData = await imageInfoRes.json();
@@ -196,7 +192,7 @@ export default async function CountryPage({ params }) {
                         Average temperature: {avTemp ? `${avTemp.fahrenheit} F° (${avTemp.celsius} C°)`: 'N/A'}
                     </p>
                     <p>
-                        Sun hours annually: {sunHours ? sunHours.toLocaleString(undefined, { maximumFractionDigits: 0 }) : 'N/A'}
+                        Sun hours annually: {sunHours.length > 0 ? sunHours.toLocaleString(undefined, { maximumFractionDigits: 0 }) : 'N/A'}
                     </p>
                     <p>
                         Annual rainfall: {rainFall ? rainFall.toLocaleString(undefined, { maximumFractionDigits: 0 }) + " mm" : 'N/A'}

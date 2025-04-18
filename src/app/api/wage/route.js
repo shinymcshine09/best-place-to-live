@@ -17,7 +17,7 @@ export async function GET(req) {
         { country: "Australia", gdpPerCapita: 67978.737 },
         { country: "Austria", gdpPerCapita: 61079.62 },
         { country: "Azerbaijan", gdpPerCapita: 7428.084 },
-        { country: "Bahamas, The", gdpPerCapita: 37180.045 },
+        { country: "Bahamas", gdpPerCapita: 37180.045 },
         { country: "Bahrain", gdpPerCapita: 29886.074 },
         { country: "Bangladesh", gdpPerCapita: 2773.499 },
         { country: "Barbados", gdpPerCapita: 26227.919 },
