@@ -5,7 +5,7 @@ export async function GET(req) {
     const language = searchParams.get('q5'); // Get language
 
     try {
-        const res = await fetch("https://restcountries.com/v3.1/all")
+        const res = await fetch("https://restcountries.com/v3.1/all?fields=name,languages")
         const data = await res.json();
 
         const matchingCountries = data.filter(country =>
